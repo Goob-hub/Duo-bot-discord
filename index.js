@@ -2,6 +2,7 @@
 import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
 import { createRequire } from "module";
 import { fileURLToPath } from 'url';
+import { pathToFileURL } from 'url';
 import path from 'node:path'
 import fs from 'node:fs';
 import 'dotenv/config'
@@ -20,13 +21,17 @@ for(const folder of commandFolders) {
 	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 	for(const file of commandFiles) {
-		const filePath = path.join(commandsPath, file);
-		const command = require(filePath);
-
-		if(command.default.data && command.default.execute) {
-			client.commands.set(command.default.data.name, command);
-		} else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+		try {
+			const filePath = path.join(commandsPath, file);
+			const command = await import(pathToFileURL(filePath));
+	
+			if(command.default.data && command.default.execute) {
+				client.commands.set(command.default.data.name, command);
+			} else {
+				console.error(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+			}
+		} catch (error) {
+			console.error(error);
 		}
 	}
 }
