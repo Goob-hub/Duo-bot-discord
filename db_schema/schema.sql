@@ -1,12 +1,14 @@
 CREATE TABLE users (
 	id SERIAL NOT NULL,
-	discord_id TEXT NOT NULL,
+	discord_id TEXT NOT NULL UNIQUE,
 	PRIMARY KEY(id)
 );
 
 CREATE TABLE parties (
 	id SERIAL NOT NULL,
-	name TEXT NOT NULL,
+	size int NOT NULL,
+	leader TEXT NOT NULL,
+	name TEXT NOT NULL UNIQUE,
 	wins int NOT NULL,
 	losses int NOT NULL,
 	PRIMARY KEY(id)
