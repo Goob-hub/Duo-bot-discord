@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import db_commands from '../../db_commands/db_commands.js';
+import 'dotenv/config';
 import pg from "pg";
 
 export default  {
