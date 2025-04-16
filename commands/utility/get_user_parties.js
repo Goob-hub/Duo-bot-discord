@@ -46,7 +46,7 @@ export default  {
 			await interaction.reply("There was an error fetching data");
 		}
 
-		db.end();
+		await db.end();
 
 		await interaction.reply(replyStr);
 	},

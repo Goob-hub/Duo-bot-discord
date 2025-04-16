@@ -17,11 +17,16 @@ export default  {
 		});
 
 		let bestParty;
+		let replyStr;
 		
 		db.connect();
 
 		try {
 			const parties = await db.query("SELECT * FROM parties");
+
+			if(parties.rows.length === 0) {
+				replyStr = "No parties have been created yet.";
+			}
 
 			parties.rows.forEach(({name, wins, losses}) => {
 				const ratio = wins - losses;
@@ -35,17 +40,16 @@ export default  {
 			
 		} catch (error) {
 			console.error(error.message);
-			db.end();
-			await interaction.reply("There was an error.");
+			replyStr = "There was an error running this command.";
 			return;
 		}
 
-		db.end();
+		await db.end();
 
-		if(bestParty === undefined) {
-			await interaction.reply('No parties have been created yet.');
-		} else {
-			await interaction.reply(`The best party is ${bestParty.name}. Their W-L ratio is ${bestParty.ratio}`);
+		if(bestParty !== undefined) {
+			replyStr = `The best party is ${bestParty.name}. Their W-L ratio is ${bestParty.ratio}`
 		}
+
+		await interaction.reply(replyStr);
 	},
 };

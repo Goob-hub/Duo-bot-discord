@@ -60,7 +60,7 @@ export default  {
 			}
 		}
 		
-		db.end();
+		await db.end();
 
 		await interaction.reply(replyStr);
 	},

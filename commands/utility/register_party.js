@@ -20,7 +20,6 @@ export default {
     async execute(interaction) {
         const partyLeader = interaction.options.getUser('party_leader');
         const partyName = interaction.options.getString('party_name');
-
         const db = new pg.Client({
             user: process.env.DB_USER,
             host: process.env.DB_HOST,
@@ -28,6 +27,8 @@ export default {
             password: process.env.DB_PASSWORD,
             port: parseInt(process.env.DB_PORT),
         });
+
+        let replyStr;
         
         db.connect();
         
@@ -44,13 +45,17 @@ export default {
             await db.query(`INSERT INTO user_parties (user_id, party_id) VALUES ($1, $2)`, [user.id, response.rows[0].id]);
         } catch (error) {
             console.error(error.message);
-            await interaction.reply(`Failed to register party.`);
-            await db.end();
+            replyStr = "Failed to register party."
             return;
         }
 
-        await interaction.reply(`Successfully registered party!`);
-
         await db.end();
+
+        if (replyStr === undefined) {
+            replyStr = "Successfully registered party!";            
+        } 
+
+        await interaction.reply(replyStr);
+
     },
 };

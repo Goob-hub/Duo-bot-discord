@@ -19,7 +19,6 @@ export default  {
 	async execute(interaction) {
 		const newMember = interaction.options.getUser('new_member');
 		const partyName = interaction.options.getString('party_name');
-
 		const db = new pg.Client({
 			user: process.env.DB_USER,
 			host: process.env.DB_HOST,
@@ -27,6 +26,8 @@ export default  {
 			password: process.env.DB_PASSWORD,
 			port: parseInt(process.env.DB_PORT),
 		});
+
+		let replyStr;
 		
 		db.connect();
 		
@@ -45,6 +46,7 @@ export default  {
 			//Check if new member is already in party
 			curPartyMembers.rows.forEach(({ user_id }) => {
 				if(user_id === newMember.id) {
+					replyStr = "The person you wanted to add is already in this party."
 					throw new Error("User is already in party");
 				}
 			});
@@ -55,14 +57,19 @@ export default  {
 			await db.query(`UPDATE parties SET size = $1 WHERE name = $2`, [curParty.size + 1, curParty.name]);
 		} catch (error) {
 			console.error(error.message);
-			await interaction.reply(`Failed to add user to party.`);
-			await db.end();
-
+			if(replyStr === undefined) {
+				replyStr = "There was an error running this command."
+			}
 			return;
 		}
-
-		await interaction.reply(`Successfully added member to party!`);
-
+		
 		await db.end();
+
+		if(replyStr === undefined) {
+			replyStr = "Successfully added member to party!";
+		}
+
+		await interaction.reply(replyStr);
+
 	},
 };
