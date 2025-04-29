@@ -20,8 +20,8 @@ export default  {
 	async execute(interaction) {
 		const interactionUser = await interaction.guild.members.fetch(interaction.user.id);
 		const partyName = interaction.options.getString('party_name');
-		const isWin = interaction.options.getBoolean('won_or_lost');
-		const userId = `@<${interactionUser.user.id}>`;
+		const isWin = interaction.options.getBoolean('did_you_win');
+		const userId = interactionUser.user.id;
 		const db = new pg.Client({
 			user: process.env.DB_USER,
 			host: process.env.DB_HOST,

@@ -27,7 +27,7 @@ export default  {
 			port: parseInt(process.env.DB_PORT),
 		});
 
-		let replyStr;
+		let replyStr = ``;
 		
 		db.connect();
 		
@@ -45,7 +45,7 @@ export default  {
 
 			//Check if new member is already in party
 			curPartyMembers.rows.forEach(({ user_id }) => {
-				if(user_id === newMember.id) {
+				if(user_id === curUser.id) {
 					replyStr = "The person you wanted to add is already in this party."
 					throw new Error("User is already in party");
 				}
@@ -55,21 +55,17 @@ export default  {
 			await db.query(`INSERT INTO user_parties (user_id, party_id) VALUES ($1, $2)`, [curUser.id, curParty.id]);
 
 			await db.query(`UPDATE parties SET size = $1 WHERE name = $2`, [curParty.size + 1, curParty.name]);
+
+			replyStr = "Successfully added member to party!";
 		} catch (error) {
 			console.error(error.message);
-			if(replyStr === undefined) {
+			if(replyStr.length === 0) {
 				replyStr = "There was an error running this command."
 			}
-			return;
 		}
 		
 		await db.end();
 
-		if(replyStr === undefined) {
-			replyStr = "Successfully added member to party!";
-		}
-
 		await interaction.reply(replyStr);
-
 	},
 };
